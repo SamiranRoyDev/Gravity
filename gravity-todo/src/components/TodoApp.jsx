@@ -4,6 +4,7 @@ import TodoList from './TodoList';
 export default function TodoApp() {
   const [todo, setTodo] = useState('');
   const [todos, setTodos] = useState([]);
+  const [status,setStatus] = useState('all');
 
   useEffect(() => {
     const rawTodos = localStorage.getItem('todos');
@@ -45,6 +46,30 @@ export default function TodoApp() {
     setTodo('');
   };
 
+  const handleFiltter = (e) => {
+    const filterValue = e.target.value;
+    setStatus(filterValue);
+    const newTodos = JSON.parse(localStorage.getItem('todos'));
+    switch (filterValue) {
+      case 'all':
+        setTodos(newTodos);
+        break;
+      case 'completed': {
+        const completedTodos = newTodos.filter(todo => todo.completed === true);
+        setTodos(completedTodos);
+        break;
+      }
+      case 'pending': {
+        const pendingTodos = newTodos.filter(todo => todo.completed === false);
+        setTodos(pendingTodos);
+        break;
+      }
+      default:
+        setTodos(newTodos);
+        break;    
+    }
+  }
+
   return (
     <>
       <div className="container">
@@ -66,7 +91,7 @@ export default function TodoApp() {
                       onChange={e => setTodo(e.target.value)}
                     />
                   </div>
-                  <div className="w-100 mt-2 d-flex justify-content-center">
+                  <div className="mt-2 d-flex justify-content-center">
                     <button
                       type="button"
                       className="btn btn-danger btn-lg w-25"
@@ -79,7 +104,14 @@ export default function TodoApp() {
               </div>
             </div>
             <div className="list-todo">
-              <div className="card-body d-flex flex-column mt-2 justify-content-center border">
+            <select className="custom-select mt-1" style={{ maxWidth: '200px' }} onChange={handleFiltter} value={status}>
+              <option value="all">All</option>
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+            </select>
+
+              <div className="card-body d-flex flex-column mt-1 justify-content-center border"
+              style={{ maxHeight: '50vh', overflowY: 'auto' }}>
                 <TodoList todos={todos} setTodos={setTodos} />
               </div>
             </div>
